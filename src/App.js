@@ -1,40 +1,66 @@
 import React, { useState } from 'react';
 
-function App() {
-  const [tasks, setTasks] = useState([]);
-  const [newTask, setNewTask] = useState('');
+function TodoList() {
+  const [todos, setTodos] = useState([]);
+  const [inputValue, setInputValue] = useState('');
 
-  const addTask = () => {
-    if (newTask.trim() !== '') {
-      setTasks([...tasks, newTask]);
-      setNewTask('');
+  const handleAddTodo = () => {
+    if (inputValue.trim() !== '') {
+      const newTodo = {
+        id: Date.now(),
+        text: inputValue,
+        completed: false,
+      };
+      setTodos((prevTodos) => [...prevTodos, newTodo]);
+      setInputValue('');
     }
   };
 
-  const deleteTask = (index) => {
-    const updatedTasks = tasks.filter((_, i) => i !== index);
-    setTasks(updatedTasks);
+  const handleDeleteTodo = (id) => {
+    setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
+  };
+
+  const handleToggleCompletion = (id) => {
+    setTodos((prevTodos) =>
+      prevTodos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    );
+  };
+
+  const TodoItem = ({ todo }) => {
+    return (
+      <li>
+        <span
+          style={{
+            textDecoration: todo.completed ? 'line-through' : 'none',
+          }}
+        >
+          {todo.text}
+        </span>
+        <button onClick={() => handleDeleteTodo(todo.id)}>Delete</button>
+        <button onClick={() => handleToggleCompletion(todo.id)}>
+          {todo.completed ? 'Undo' : 'Complete'}
+        </button>
+      </li>
+    );
   };
 
   return (
     <div>
-      <h1 class="">To-Do List</h1>
       <input
         type="text"
-        value={newTask}
-        onChange={(e) => setNewTask(e.target.value)}
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
       />
-      <button onClick={addTask}>Add Task</button>
+      <button onClick={handleAddTodo}>Add</button>
       <ul>
-        {tasks.map((task, index) => (
-          <li key={index}>
-            {task}
-            <button onClick={() => deleteTask(index)}>Delete</button>
-          </li>
+        {todos.map((todo) => (
+          <TodoItem key={todo.id} todo={todo} />
         ))}
       </ul>
     </div>
   );
 }
 
-export default App;
+export default TodoList;
